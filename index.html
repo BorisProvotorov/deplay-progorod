@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<select name="value">
+  <option class="group">
+    Кировский форк
+  </option>
+  <option value="https://prochepetsk.ru">pgch.frontend (master)</option>
+  <option value="https://progoroduhta.ru">pguhta.frontend (master)</option>
+  <option value="https://ngnovoros.ru">pg23.frontend (master)</option>
+  <option value="https://progorod33.ru">pg33.frontend (master)</option>
+  <option value="https://progorod43.ru">pg43.frontend (master)</option>
+  <option value="https://progorod58.ru">pg58.frontend (master)</option>
+  <option value="https://youtvnews.com">youtvnews.frontend (master)</option>
+  <option value="https://lipetsknews.ru">lipetsknews.frontend (master)</option>
+  <option value="https://usolie.info">usolie.frontend (master)</option>
+  <option value="https://media41.ru">media41.frontend (master)</option>
+  <option value="https://progorod35.ru">pg35.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://irbit.city">irbit.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://irkutsk.news">irkutsk.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://bryansk.news">bryansk.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://kaliningradtv.ru">kaliningradtv.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://materinstvo.ru">materinstvo.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://volgogradru.com">volgogradru.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://women365.ru">women365.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://oren1.ru">pg56.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://progorod62.ru">pg62.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://progorodche.ru">pg74.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pg69.ru">pg69.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option class="group">
+    Чебоксарский форк
+  </option>
+  <option value="https://pg02.ru">pg02.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pg12.ru">pg12.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pg21.ru">pg21.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://progorod36.ru">pg36.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://progorodnn.ru">pgnn.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://prosaratov.ru">pg64.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://prodzer.ru">pgdzer.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pg37.ru">pg37.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pg46.ru">pg46.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pgr76.ru">pg176.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option value="https://pgn21.ru">pg121.frontend (b.provotorov-23078_banners_fixed_height)</option>
+  <option class="group">
+    jenkins2
+  </option>
+  <option value="https://newtambov.ru">newtambov.frontend (b.provotorov-22715_npm_update)</option>
+  <option value="https://myliski.ru">myliski.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://pg11.ru">pg11.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://pg13.ru">pg13.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://gazeta45.com">gazeta45.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://vladivostoktimes.ru">vladivostoktimes.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://newskrasnodar.ru">newskrasnodar.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://inforostov.ru">inforostov.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+  <option value="https://progorod76.ru">pg76.frontend (b.provotorov-23078_banners_fixed_height_next15)</option>
+</select>
+
+<div id="selectboxValues"></div>
+  <script>
+    const selectbox = document.querySelector('select');
+    selectbox.style = 'display: none;';
+    const selectboxValues = document.querySelector('#selectboxValues');
+
+    for(let i = 0; i < selectbox.children.length; i += 1) {
+      const isGroupClass = selectbox.children[i].classList.contains('group');
+      selectboxValues.innerHTML += `<p class="${isGroupClass ? 'group': 'group-item'}">
+        ${selectbox[i].innerHTML}${!isGroupClass ? `— <a href="${selectbox[i].value}" target="_blank">${selectbox[i].value}</a>`: ''}
+      </p>`;
+    }
+
+    const statistics = document.createElement('div');
+    statistics.setAttribute('class', 'statistics');
+    statistics.innerHTML = `
+      Выполнено: <span class="deploy-is-done">0</span><br>
+      Осталось выполнить: <span class="deploy-no-done">${document.querySelectorAll('.group-item').length}</span><br>
+      Время выполнения: <span class="time">0:00:00</span>
+
+    `;
+
+    selectboxValues.before(statistics);
+
+    const handleStartTimer = () => {
+      const time = document.querySelector('.time');
+
+      const secondsToHms = (d) => {
+          d = Number(d);
+          var h = Math.floor(d / 3600);
+          var m = Math.floor(d % 3600 / 60);
+          var s = Math.floor(d % 3600 % 60);
+
+          var hDisplay = h > 0 ? `${h}:` : "0:";
+          var mDisplay = m > 0 ? `${m}:` : "00:";
+          var sDisplay = s > 0 ? `${s}` : "0";
+
+          if(s < 10) {
+            sDisplay = `0${s}`
+          } 
+
+          if(m < 10) {
+            mDisplay = `0${m}:`
+          } 
+
+          return hDisplay + mDisplay + sDisplay; 
+      };
+
+      let timeStart = 0;
+      setInterval(() => {
+        // console.log(timeStart+=1);
+        time.innerHTML = secondsToHms(timeStart+=1);
+      }, 1000);
+    }
+
+
+    const groupItems = document.querySelectorAll('.group-item');
+    let startDeplay = 0;
+    groupItems.forEach(item => {
+      let countClick = 0;
+      item.addEventListener('click', (evt) => {
+        if (evt.target.nodeName === 'A') return;
+
+        startDeplay += 1;
+        if (startDeplay === 1) {
+          handleStartTimer();
+        }
+        countClick = countClick > 2 ? 1 : countClick += 1;
+        
+        if (countClick === 1) {
+          item.classList.add('yellow');
+          item.classList.remove('green');
+          const allDeploys = document.querySelectorAll('.group-item').length;
+          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
+          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
+          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
+        }
+        if (countClick === 2) {
+          item.classList.add('green');
+          item.classList.remove('yellow');
+          const allDeploys = document.querySelectorAll('.group-item').length;
+          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
+          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
+          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
+        }
+        if (countClick === 3) {
+          item.classList.remove('yellow');
+          item.classList.remove('green');
+          const allDeploys = document.querySelectorAll('.group-item').length;
+          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
+          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
+          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
+        }
+      });
+    });
+
+  </script>
+  <style>
+    .group {
+      font-size: 18px;
+      font-family: sans-serif;
+      font-weight: bold;
+    }
+
+    .agreements__item {
+      padding: 30px 0 30px 0;
+      border-bottom: 1px solid;
+      max-width: 800px;
+    }
+
+    .agreement__domain {
+      margin-bottom: 10px;
+    }
+    
+    p {
+      margin: 0;
+    }
+
+    .group {
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .group + .group-item {
+      border-top: 1px solid #cccccc;
+    }
+
+    .group-item:hover {
+      background-color: #e3e3e3;
+    }
+
+    .group-item:not(:last-child) {
+      border-bottom: 1px solid #cccccc;
+    }
+
+    .group-item {
+      padding: 10px;
+    }
+
+    .group-item.active {
+      background-color: #437a49;
+      color: #fff;
+      padding: 10px;
+    }
+
+    .group-item.active a {
+      color: #fff;
+    }
+
+    .group-item.yellow {
+      background-color: rgb(242 238 175);
+    }
+
+    .group-item.green {
+      background-color: #437a49;
+      color: #ffffff;
+    }
+
+    .group-item.green a {
+      color: #ffffff;
+    }
+
+  </style>
+
+<!-- <script> (function(d, o) { if (d.getElementById(o.id)) return; var s = d.createElement('script'); s.id = o.id; s.async = true; s.type = 'text/javascript'; s.src = 'https://madte.st/sdk-v2.js'; s.onload = function (){ new Madtest(o); }; d.head.appendChild(s); })(document, {"testId":"z8m0qkdf"});</script> <div class="madtest" data-id="z8m0qkdf"></div> -->
+</body>
+</html>
