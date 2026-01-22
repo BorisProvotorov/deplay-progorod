@@ -65,102 +65,127 @@
 </select>
 
 <div id="selectboxValues"></div>
-  <script>
-    const selectbox = document.querySelector('select');
-    selectbox.style = 'display: none;';
-    const selectboxValues = document.querySelector('#selectboxValues');
+<script>
+  const selectbox = document.querySelector('select');
+  selectbox.style = 'display: none;';
+  const selectboxValues = document.querySelector('#selectboxValues');
 
-    for(let i = 0; i < selectbox.children.length; i += 1) {
-      const isGroupClass = selectbox.children[i].classList.contains('group');
-      selectboxValues.innerHTML += `<p class="${isGroupClass ? 'group': 'group-item'}">
-        ${selectbox[i].innerHTML}${!isGroupClass ? `— <a href="${selectbox[i].value}" target="_blank">${selectbox[i].value}</a>`: ''}
-      </p>`;
-    }
+  // Генерируем HTML из опций select
+  for (let i = 0; i < selectbox.children.length; i += 1) {
+    const isGroupClass = selectbox.children[i].classList.contains('group');
+    selectboxValues.innerHTML += `<p class="${isGroupClass ? 'group' : 'group-item'}" data-index="${i}">
+      ${selectbox[i].innerHTML}${!isGroupClass ? `— <a href="${selectbox[i].value}" target="_blank">${selectbox[i].value}</a>` : ''}
+    </p>`;
+  }
 
-    const statistics = document.createElement('div');
-    statistics.setAttribute('class', 'statistics');
-    statistics.innerHTML = `
-      Выполнено: <span class="deploy-is-done">0</span><br>
-      Осталось выполнить: <span class="deploy-no-done">${document.querySelectorAll('.group-item').length}</span><br>
-      Время выполнения: <span class="time">0:00:00</span>
+  // Добавляем блок статистики
+  const statistics = document.createElement('div');
+  statistics.setAttribute('class', 'statistics');
+  statistics.innerHTML = `
+    Выполнено: <span class="deploy-is-done">0</span><br>
+    Осталось выполнить: <span class="deploy-no-done">${document.querySelectorAll('.group-item').length}</span><br>
+    Время выполнения: <span class="time">0:00:00</span>
+  `;
+  selectboxValues.before(statistics);
 
-    `;
+  // Функция перевода секунд в формат ЧЧ:ММ:СС
+  const secondsToHms = (d) => {
+    d = Number(d);
+    const h = Math.floor(d / 3600);
+    const m = Math.floor((d % 3600) / 60);
+    const s = Math.floor(d % 60);
 
-    selectboxValues.before(statistics);
+    const hDisplay = h > 0 ? `${h}:` : '0:';
+    const mDisplay = m < 10 ? `0${m}:` : `${m}:`;
+    const sDisplay = s < 10 ? `0${s}` : `${s}`;
 
-    const handleStartTimer = () => {
-      const time = document.querySelector('.time');
+    return hDisplay + mDisplay + sDisplay;
+  };
 
-      const secondsToHms = (d) => {
-          d = Number(d);
-          var h = Math.floor(d / 3600);
-          var m = Math.floor(d % 3600 / 60);
-          var s = Math.floor(d % 3600 % 60);
+  // Инициализация таймера с сохранением в localStorage
+  let timerInterval;
+  const handleStartTimer = () => {
+    const timeElement = document.querySelector('.time');
+    let timeStart = parseInt(localStorage.getItem('timerSeconds')) || 0;
 
-          var hDisplay = h > 0 ? `${h}:` : "0:";
-          var mDisplay = m > 0 ? `${m}:` : "00:";
-          var sDisplay = s > 0 ? `${s}` : "0";
+    timerInterval = setInterval(() => {
+      timeStart += 1;
+      localStorage.setItem('timerSeconds', timeStart);
+      timeElement.innerHTML = secondsToHms(timeStart);
+    }, 1000);
+  };
 
-          if(s < 10) {
-            sDisplay = `0${s}`
-          } 
-
-          if(m < 10) {
-            mDisplay = `0${m}:`
-          } 
-
-          return hDisplay + mDisplay + sDisplay; 
-      };
-
-      let timeStart = 0;
-      setInterval(() => {
-        // console.log(timeStart+=1);
-        time.innerHTML = secondsToHms(timeStart+=1);
-      }, 1000);
-    }
-
-
+  // Восстановление состояния элементов из localStorage
+  const restoreState = () => {
     const groupItems = document.querySelectorAll('.group-item');
-    let startDeplay = 0;
     groupItems.forEach(item => {
-      let countClick = 0;
-      item.addEventListener('click', (evt) => {
-        if (evt.target.nodeName === 'A') return;
+      const index = item.getAttribute('data-index');
+      const storedClass = localStorage.getItem(`item-${index}`);
 
-        startDeplay += 1;
-        if (startDeplay === 1) {
-          handleStartTimer();
-        }
-        countClick = countClick > 2 ? 1 : countClick += 1;
-        
-        if (countClick === 1) {
-          item.classList.add('yellow');
-          item.classList.remove('green');
-          const allDeploys = document.querySelectorAll('.group-item').length;
-          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
-          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
-          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
-        }
-        if (countClick === 2) {
-          item.classList.add('green');
-          item.classList.remove('yellow');
-          const allDeploys = document.querySelectorAll('.group-item').length;
-          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
-          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
-          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
-        }
-        if (countClick === 3) {
-          item.classList.remove('yellow');
-          item.classList.remove('green');
-          const allDeploys = document.querySelectorAll('.group-item').length;
-          const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
-          document.querySelector('.deploy-no-done').textContent = allDeploys - totalDeploysDone;
-          document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
-        }
-      });
+      if (storedClass) {
+        item.classList.add(storedClass);
+      }
     });
 
-  </script>
+    // Обновляем статистику после восстановления
+    updateStatistics();
+  };
+
+  // Обновление статистики
+  const updateStatistics = () => {
+    const totalDeploys = document.querySelectorAll('.group-item').length;
+    const totalDeploysDone = document.querySelectorAll('.group-item.green').length;
+
+    document.querySelector('.deploy-no-done').textContent = totalDeploys - totalDeploysDone;
+    document.querySelector('.deploy-is-done').textContent = totalDeploysDone;
+  };
+
+  // Обработчик клика по элементу
+  const groupItems = document.querySelectorAll('.group-item');
+  let startDeplay = 0;
+
+  groupItems.forEach(item => {
+    let countClick = 0;
+    const index = item.getAttribute('data-index');
+
+    item.addEventListener('click', (evt) => {
+      if (evt.target.nodeName === 'A') return;
+
+      startDeplay += 1;
+      if (startDeplay === 1 && !localStorage.getItem('timerSeconds')) {
+        handleStartTimer();
+      }
+
+      countClick = countClick >= 2 ? 0 : countClick + 1;
+
+      // Удаляем старые классы
+      item.classList.remove('yellow', 'green');
+
+      if (countClick === 1) {
+        item.classList.add('yellow');
+      } else if (countClick === 2) {
+        item.classList.add('green');
+      }
+
+      // Сохраняем текущее состояние в localStorage
+      localStorage.setItem(`item-${index}`, item.classList.contains('green') ? 'green' : item.classList.contains('yellow') ? 'yellow' : '');
+
+      // Обновляем статистику
+      updateStatistics();
+    });
+  });
+
+  // Восстанавливаем состояние при загрузке страницы
+  window.addEventListener('load', () => {
+    restoreState();
+
+    // Если таймер был запущен, продолжаем его
+    const storedSeconds = localStorage.getItem('timerSeconds');
+    if (storedSeconds && storedSeconds > 0) {
+      handleStartTimer();
+    }
+  });
+</script>
   <style>
     .group {
       font-size: 18px;
@@ -225,9 +250,6 @@
     .group-item.green a {
       color: #ffffff;
     }
-
   </style>
-
-<!-- <script> (function(d, o) { if (d.getElementById(o.id)) return; var s = d.createElement('script'); s.id = o.id; s.async = true; s.type = 'text/javascript'; s.src = 'https://madte.st/sdk-v2.js'; s.onload = function (){ new Madtest(o); }; d.head.appendChild(s); })(document, {"testId":"z8m0qkdf"});</script> <div class="madtest" data-id="z8m0qkdf"></div> -->
 </body>
 </html>
