@@ -73,10 +73,69 @@
   // Генерируем HTML из опций select
   for (let i = 0; i < selectbox.children.length; i += 1) {
     const isGroupClass = selectbox.children[i].classList.contains('group');
+    let innerHTML = selectbox[i].innerHTML;
+
+    // Ищем шаблон (название_ветки) и добавляем кнопку копирования
+    const branchRegex = /\(([^)]+)\)/;
+    const match = innerHTML.match(branchRegex);
+    if (match) {
+      const branchName = match[1];
+      innerHTML = innerHTML.replace(
+        branchRegex,
+        `(${branchName} <button class="copy-btn" data-branch="${branchName}" title="Скопировать название ветки"></button>)`
+      );
+    }
+
     selectboxValues.innerHTML += `<p class="${isGroupClass ? 'group' : 'group-item'}" data-index="${i}">
-      ${selectbox[i].innerHTML}${!isGroupClass ? `— <a href="${selectbox[i].value}" target="_blank">${selectbox[i].value}</a>` : ''}
+      ${innerHTML}${!isGroupClass ? `— <a href="${selectbox[i].value}" target="_blank">${selectbox[i].value}</a>` : ''}
     </p>`;
   }
+
+  // Функция копирования в буфер обмена
+  async function copyToClipboard(text) {
+    try {
+      // Современный API (требуется HTTPS и активное взаимодействие пользователя)
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      
+      // Fallback для старых браузеров
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = 0;
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return success;
+    } catch (err) {
+      console.error('Ошибка при копировании:', err);
+      return false;
+    }
+  }
+
+  // Обработчик клика по кнопке копирования
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const branchName = e.target.getAttribute('data-branch');
+      const success = await copyToClipboard(branchName);
+      
+      if (success) {
+        // Визуальная обратная связь: меняем иконку на галочку
+        e.target.setAttribute('data-copied', 'true');
+        setTimeout(() => {
+          e.target.removeAttribute('data-copied');
+        }, 2000);
+      } else {
+        alert('Не удалось скопировать. Попробуйте вручную.');
+      }
+    });
+  });
 
   // Добавляем блок статистики
   const statistics = document.createElement('div');
@@ -100,6 +159,7 @@
     const mDisplay = m < 10 ? `0${m}:` : `${m}:`;
     const sDisplay = s < 10 ? `0${s}` : `${s}`;
 
+
     return hDisplay + mDisplay + sDisplay;
   };
 
@@ -122,6 +182,7 @@
     groupItems.forEach(item => {
       const index = item.getAttribute('data-index');
       const storedClass = localStorage.getItem(`item-${index}`);
+
 
       if (storedClass) {
         item.classList.add(storedClass);
@@ -150,7 +211,8 @@
     const index = item.getAttribute('data-index');
 
     item.addEventListener('click', (evt) => {
-      if (evt.target.nodeName === 'A') return;
+      if (evt.target.nodeName === 'A' || evt.target.classList.contains('copy-btn')) return;
+
 
       startDeplay += 1;
       if (startDeplay === 1 && !localStorage.getItem('timerSeconds')) {
@@ -158,6 +220,7 @@
       }
 
       countClick = countClick >= 2 ? 0 : countClick + 1;
+
 
       // Удаляем старые классы
       item.classList.remove('yellow', 'green');
@@ -203,8 +266,8 @@
     updateStatistics();
   };
 
-    // Добавляем кнопку очистки
-    const clearButton = document.querySelector('.clear-button');
+  // Добавляем кнопку очистки
+  const clearButton = document.querySelector('.clear-button');
 
   // Привязываем обработчик к кнопке
   clearButton.addEventListener('click', clearStorageAndClasses);
@@ -314,6 +377,44 @@
       background-color: #b21f30;
       transform: translateY(0);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+        /* Стили для кнопки копирования */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      border: none;
+      background-color: #000000;
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .copy-btn:hover {
+      background-color: rgb(54, 54, 54);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .copy-btn::before {
+      content: 'Копировать имя ветки'; /* Символ "ножницы" */
+      line-height: 1;
+    }
+
+    .copy-btn[data-copied="true"]::before {
+      content: '✓';
+      color: #28a745;
+    }
+
+    .copy-btn[data-copied="true"]:hover {
+      background-color: #218837;
     }
   </style>
 </body>
