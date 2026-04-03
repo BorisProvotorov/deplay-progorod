@@ -106,7 +106,7 @@
       // Удаляем старое уведомление, если оно есть
       const existing = document.querySelector('.copy-notification');
       if (existing) {
-        document.body.removeChild(existing);
+        document.querySelector('#git-command-list').removeChild(existing);
       }
 
       const notification = document.createElement('div');
