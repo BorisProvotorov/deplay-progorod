@@ -68,6 +68,8 @@
         }
 
         comandGIT = `
+          <div class="git-command">git checkout ${mainBranchSelectbox.value}</div>
+          <div class="git-command">git pull origin ${mainBranchSelectbox.value}</div>
           <div class="git-command">git checkout ${targetBranchFormField.value}</div>
           <div class="git-command">git merge ${mainBranchSelectbox.value} --no-ff</div>
           <div class="git-command">git add .</div>
