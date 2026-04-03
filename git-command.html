@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/main.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="git-form">
+    <div>
+      <select id="main-branch" class="selectbox" name="main-branch">
+        <option selected disabled hidden>Основная ветка GIT</option>
+        <option>master</option>
+        <option>b.provotorov-22715_npm_update</option>
+      </select>
+    </div>
+    <div>
+      <input id="target-branch" type="text" name="target-branch" placeholder="Целевая ветка GIT" />
+    </div>
+    <button id="btn-generate-git-command" type="button">Генерировать команды GIT</button>
+    <div id="git-command-list"></div>
+  </div>
+  <script>
+    const mainBranchSelectbox = document.querySelector('#main-branch'),
+    targetBranchFormField = document.querySelector('#target-branch'),
+    btnGenerateGitCommand = document.querySelector('#btn-generate-git-command'),
+    gitCommandList = document.querySelector('#git-command-list');
+    
+    let branches = [
+      { name: 'master'},
+      { name: 'b.provotorov-0-redirects-in-middleware'},
+      { name: 'b.provotorov-23078_banners_fixed_height'},
+      { name: 'b.provotorov-22715_npm_update'},
+      { name: 'b.provotorov-23642_cls_pg11_test_next15'}
+    ];
+
+    let comandGIT = '';
+
+    const formValitation = (mainBranchSelectbox, targetBranchFormField) => {
+      const mainBranchSelected = mainBranchSelectbox.options[mainBranchSelectbox.selectedIndex];
+      if ((mainBranchSelected.hasAttribute('disabled') && mainBranchSelected.hasAttribute('hidden')) || targetBranchFormField.value === '') {
+        btnGenerateGitCommand.setAttribute('disabled', true);
+        return false;
+      }
+      btnGenerateGitCommand.removeAttribute('disabled', true);
+      return true;
+    };
+
+    mainBranchSelectbox.addEventListener('change', () => {
+      formValitation(mainBranchSelectbox, targetBranchFormField);
+    });
+
+    targetBranchFormField.addEventListener('input', () => {
+      formValitation(mainBranchSelectbox, targetBranchFormField);
+    });
+
+    formValitation(mainBranchSelectbox, targetBranchFormField);
+
+    if (btnGenerateGitCommand) {
+      btnGenerateGitCommand.addEventListener('click', () => {
+        const isValidate = formValitation(mainBranchSelectbox, targetBranchFormField);
+
+        if (!isValidate) {
+          return false;
+        }
+
+        comandGIT = `
+          <div class="git-command">git checkout ${targetBranchFormField.value}</div>
+          <div class="git-command">git merge ${mainBranchSelectbox.value} --no-ff</div>
+          <div class="git-command">git add .</div>
+          <div class="git-command">git commit -m "Актуализация из ${mainBranchSelectbox.value}"</div>
+          <div class="git-command">git push origin ${targetBranchFormField.value}</div>
+        `;
+        gitCommandList.innerHTML = comandGIT;
+
+        // Добавляем обработчики копирования для всех элементов с классом git-command
+        document.querySelectorAll('.git-command').forEach(element => {
+          element.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(element.textContent);
+              showCopyNotification(); // Показываем уведомление при успешном копировании
+            } catch (err) {
+              // Если Clipboard API недоступен, используем fallback
+              const textArea = document.createElement('textarea');
+              textArea.value = element.textContent;
+              textArea.style.position = 'fixed';
+              textArea.style.left = '-999999px';
+              textArea.style.top = '-999999px';
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              showCopyNotification();
+            }
+          });
+        });
+      });
+    }
+
+    // Функция показа уведомления о копировании
+    function showCopyNotification() {
+      // Удаляем старое уведомление, если оно есть
+      const existing = document.querySelector('.copy-notification');
+      if (existing) {
+        document.body.removeChild(existing);
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'copy-notification';
+      notification.textContent = 'Скопировано!';
+      notification.style.cssText = `
+        position: absolute;
+        top: 3px;
+        left: calc(100% + 13px);
+        background: rgb(76, 175, 80);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        z-index: 10000;
+        font-family: monospace;
+        font-size: 14px;
+        transition: opacity 0.3s;
+      `;
+      document.querySelector('#git-command-list').appendChild(notification);
+
+      // Автоматически удаляем через 1.5 с
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            document.querySelector('#git-command-list').removeChild(notification);
+          }
+        }, 300);
+      }, 1000);
+    }
+  </script>
+  <style>
+
+  </style>
+</body>
+</html>
