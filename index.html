@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="js/selectbox.js"></script> -->
+  <link rel="stylesheet" href="css/selectbox.css">
   <title>Document</title>
 </head>
 <body>
@@ -67,6 +69,7 @@
 </select>
 
 <div id="selectboxValues"></div>
+
 <script>
   const selectbox = document.querySelector('select');
   selectbox.style = 'display: none;';
@@ -215,7 +218,6 @@
     item.addEventListener('click', (evt) => {
       if (evt.target.nodeName === 'A' || evt.target.classList.contains('copy-btn')) return;
 
-
       startDeplay += 1;
       if (startDeplay === 1 && !localStorage.getItem('timerSeconds')) {
         handleStartTimer();
@@ -284,6 +286,8 @@
       handleStartTimer();
     }
   });
+
+  console.log(process.env.DATABASE_URL);
 </script>
   <style>
     .group {
